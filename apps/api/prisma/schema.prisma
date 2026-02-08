@@ -135,12 +135,16 @@ model grievances {
   updated_at            DateTime            @updatedAt
   resolved_at           DateTime?
 
+  verification_feedback String?           @db.Text
+
   citizen         citizens          @relation(fields: [citizen_id], references: [id])
   ward            wards?            @relation(fields: [ward_id], references: [id])
   department      departments?      @relation(fields: [assigned_department_id], references: [id])
   officer         officers?         @relation(fields: [assigned_officer_id], references: [id])
   community_issue community_issues? @relation(fields: [community_issue_id], references: [id])
   timeline        grievance_timeline[]
+  verification_tokens verification_tokens[]
+  rti_applications    rti_applications[]
 
   @@index([complaint_number])
   @@index([citizen_id])
@@ -234,4 +238,40 @@ model legal_rights {
   state          String            @default("central")
 
   @@index([category])
+}
+
+model verification_tokens {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  grievance_id String    @db.Uuid
+  token        String    @unique @db.VarChar(64)
+  expires_at   DateTime
+  used         Boolean   @default(false)
+  used_at      DateTime?
+  created_at   DateTime  @default(now())
+
+  grievance grievances @relation(fields: [grievance_id], references: [id], onDelete: Cascade)
+
+  @@index([grievance_id])
+  @@index([expires_at])
+}
+
+model rti_applications {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  grievance_id    String   @db.Uuid
+  subject         String   @db.Text
+  body            String   @db.Text
+  addressed_to    String   @db.Text
+  department_name String   @db.Text
+  reference_laws  Json     @default("[]")
+  fee_amount      String   @default("10") @db.VarChar(50)
+  language        String   @default("en") @db.VarChar(10)
+  body_hindi      String?  @db.Text
+  generated_by    String   @default("gemini") @db.VarChar(20)
+  gemini_model    String?  @db.VarChar(50)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now()) @updatedAt
+
+  grievance grievances @relation(fields: [grievance_id], references: [id], onDelete: Cascade)
+
+  @@index([grievance_id])
 }

@@ -393,13 +393,6 @@ router.get('/search', async (req: Request, res: Response) => {
 // Stubs for future phases
 // ------------------------------------------------------------------
 
-router.post('/:id/verify', async (req: Request, res: Response) => {
-  res.status(501).json({
-    success: false,
-    error: 'Not implemented - Phase 5',
-  });
-});
-
 router.patch('/:id/update', async (req: Request, res: Response) => {
   res.status(501).json({
     success: false,

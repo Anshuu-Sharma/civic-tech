@@ -5,8 +5,11 @@ import { config } from './config';
 import grievanceRoutes from './routes/grievance.routes';
 import analyticsRoutes from './routes/analytics.routes';
 import citizenRoutes from './routes/citizen.routes';
+import authRoutes from './routes/auth.routes';
 import adminRoutes from './routes/admin.routes';
 import uploadRoutes from './routes/upload.routes';
+import verificationRoutes from './routes/verification.routes';
+import rtiRoutes from './routes/rti.routes';
 import { startEscalationJob } from './jobs/escalation.job';
 import { initStorageBucket } from './services/storage.service';
 
@@ -40,11 +43,14 @@ app.get('/api/v1/health', (_req, res) => {
 });
 
 // API Routes
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/grievance', grievanceRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/citizen', citizenRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1', verificationRoutes);
+app.use('/api/v1/rti', rtiRoutes);
 
 // 404 Handler
 app.use((_req, res) => {

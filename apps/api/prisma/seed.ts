@@ -1,9 +1,16 @@
 import { PrismaClient, GrievanceCategory, OfficerRole } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+const DEFAULT_PASSWORD = 'jansunwai123';
+
 async function main() {
   console.log('Seeding database...\n');
+
+  // Hash the default password once for all officers
+  const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 12);
+  console.log(`Using password: "${DEFAULT_PASSWORD}" (hashed with bcrypt, 12 rounds)\n`);
 
   // ===========================================================================
   // 1. Wards (12 Delhi wards)
@@ -79,7 +86,6 @@ async function main() {
   // ===========================================================================
   console.log('\nCreating officers...');
 
-  const dummyHash = '$2b$10$placeholder_hash_for_seed_data_only';
   const wardNames = Object.keys(wards);
   let wardIndex = 0;
 
@@ -88,7 +94,7 @@ async function main() {
 
     const head = await prisma.officers.upsert({
       where: { email: `head.${deptSlug}@jansunwai.gov.in` },
-      update: {},
+      update: { password_hash: passwordHash },
       create: {
         name: `Head - ${deptName}`,
         department_id: deptId,
@@ -96,7 +102,7 @@ async function main() {
         role: OfficerRole.department_head,
         email: `head.${deptSlug}@jansunwai.gov.in`,
         phone: `+91900000${String(wardIndex).padStart(4, '0')}`,
-        password_hash: dummyHash,
+        password_hash: passwordHash,
       },
     });
     console.log(`  Officer (Head): ${head.name} - ${head.email}`);
@@ -110,7 +116,7 @@ async function main() {
       const wardName = wardNames[wardIndex % wardNames.length];
       const officer = await prisma.officers.upsert({
         where: { email: `officer${wardIndex + 1}.${deptSlug}@jansunwai.gov.in` },
-        update: {},
+        update: { password_hash: passwordHash },
         create: {
           name: `Officer ${wardIndex + 1} - ${deptName}`,
           department_id: deptId,
@@ -118,7 +124,7 @@ async function main() {
           role: OfficerRole.ward_officer,
           email: `officer${wardIndex + 1}.${deptSlug}@jansunwai.gov.in`,
           phone: `+91900001${String(wardIndex).padStart(4, '0')}`,
-          password_hash: dummyHash,
+          password_hash: passwordHash,
         },
       });
       console.log(`  Officer (Ward): ${officer.name} - ${wardName} - ${officer.email}`);
@@ -175,6 +181,7 @@ async function main() {
   console.log(`  Departments:  ${deptCount}`);
   console.log(`  Officers:     ${officerCount}`);
   console.log(`  Legal Rights: ${legalCount}`);
+  console.log(`  Password:     ${DEFAULT_PASSWORD} (for all officers)`);
   console.log('========================================\n');
 }
 
