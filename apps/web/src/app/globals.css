@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-saffron-50: #fff7ed;
+  --color-saffron-100: #ffedd5;
+  --color-saffron-200: #fed7aa;
+  --color-saffron-300: #fdba74;
+  --color-saffron-400: #fb923c;
+  --color-saffron-500: #f97316;
+  --color-saffron-600: #ea580c;
+  --color-saffron-700: #c2410c;
+  --color-saffron-800: #9a3412;
+  --color-saffron-900: #7c2d12;
+
+  --color-tricolor-saffron: #FF9933;
+  --color-tricolor-white: #FFFFFF;
+  --color-tricolor-green: #138808;
+  --color-tricolor-navy: #000080;
+
+  --color-civic-50: #f0f4ff;
+  --color-civic-100: #dbe4ff;
+  --color-civic-200: #bac8ff;
+  --color-civic-500: #4c6ef5;
+  --color-civic-600: #3b5bdb;
+  --color-civic-700: #364fc7;
+  --color-civic-800: #1e3a5f;
+  --color-civic-900: #0f1d35;
+
+  --font-sans: 'Outfit', system-ui, sans-serif;
+  --font-hindi: 'Noto Sans Devanagari', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Saffron gradient strip at top of pages */
+.saffron-strip {
+  background: linear-gradient(135deg, #FF9933 0%, #ea580c 50%, #138808 100%);
+  height: 4px;
+}
+
+/* Subtle noise texture overlay */
+.noise-bg {
+  position: relative;
+}
+.noise-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Step indicator pulse */
+@keyframes gentle-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(249, 115, 22, 0); }
+}
+.step-active {
+  animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+/* File drop zone */
+.drop-zone-active {
+  border-color: #f97316;
+  background-color: rgba(249, 115, 22, 0.05);
+}
+
+/* Smooth page transitions */
+.form-step-enter {
+  animation: slideIn 0.3s ease-out;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Success checkmark */
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+.success-check path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: drawCheck 0.6s ease-out 0.3s forwards;
+}
+
+@keyframes fadeScale {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+.success-fade {
+  animation: fadeScale 0.4s ease-out forwards;
+}

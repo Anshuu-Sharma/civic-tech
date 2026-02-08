@@ -1,0 +1,237 @@
+// =============================================================================
+// JanSunwai AI - Prisma Schema
+// Database: PostgreSQL + PostGIS (hosted on Supabase)
+// =============================================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
+}
+
+// =============================================================================
+// Enums
+// =============================================================================
+
+enum GrievanceCategory {
+  water_supply
+  electricity
+  roads_potholes
+  sanitation_garbage
+  drainage_sewage
+  street_lighting
+  public_transport
+  ration_card_pds
+  pension_welfare
+  corruption_misconduct
+  building_construction
+  parks_public_spaces
+}
+
+enum GrievanceStatus {
+  open
+  acknowledged
+  in_progress
+  resolved
+  reopened
+  escalated
+}
+
+enum Channel {
+  web
+  voice
+  whatsapp
+  missed_call
+  sms
+}
+
+enum PreferredChannel {
+  web
+  voice
+  whatsapp
+  sms
+}
+
+enum VulnerabilityFlag {
+  elderly
+  disabled
+  bpl
+  pregnant
+}
+
+enum TimelineEventType {
+  filed
+  acknowledged
+  assigned
+  escalated
+  status_change
+  resolved
+  verified
+  reopened
+}
+
+enum OfficerRole {
+  ward_officer
+  department_head
+  commissioner
+}
+
+enum CommunityIssueStatus {
+  open
+  in_progress
+  resolved
+}
+
+// =============================================================================
+// Models
+// =============================================================================
+
+model citizens {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phone               String            @unique
+  name                String?
+  preferred_language  String            @default("hi")
+  preferred_channel   PreferredChannel  @default(web)
+  ward_id             String?           @db.Uuid
+  vulnerability_flags VulnerabilityFlag[]
+  total_complaints    Int               @default(0)
+  created_at          DateTime          @default(now())
+
+  ward       wards?       @relation(fields: [ward_id], references: [id])
+  grievances grievances[]
+
+  @@index([phone])
+}
+
+model grievances {
+  id                    String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  complaint_number      String              @unique
+  citizen_id            String              @db.Uuid
+  category              GrievanceCategory
+  sub_category          String?
+  description           String
+  raw_input             Json                @default("{}")
+  location              Unsupported("geometry(Point,4326)")?
+  address               String?
+  ward_id               String?             @db.Uuid
+  severity_score        Int                 @default(0)
+  status                GrievanceStatus     @default(open)
+  channel               Channel
+  language              String              @default("hi")
+  media_urls            String[]            @default([])
+  assigned_department_id String?            @db.Uuid
+  assigned_officer_id   String?             @db.Uuid
+  community_issue_id    String?             @db.Uuid
+  escalation_level      Int                 @default(1)
+  resolution_verified   Boolean             @default(false)
+  satisfaction_score    Int?
+  legal_rights_summary  String?
+  created_at            DateTime            @default(now())
+  updated_at            DateTime            @updatedAt
+  resolved_at           DateTime?
+
+  citizen         citizens          @relation(fields: [citizen_id], references: [id])
+  ward            wards?            @relation(fields: [ward_id], references: [id])
+  department      departments?      @relation(fields: [assigned_department_id], references: [id])
+  officer         officers?         @relation(fields: [assigned_officer_id], references: [id])
+  community_issue community_issues? @relation(fields: [community_issue_id], references: [id])
+  timeline        grievance_timeline[]
+
+  @@index([complaint_number])
+  @@index([citizen_id])
+  @@index([status])
+  @@index([category])
+  @@index([assigned_department_id])
+  @@index([ward_id])
+  @@index([created_at])
+}
+
+model grievance_timeline {
+  id           String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  grievance_id String            @db.Uuid
+  event_type   TimelineEventType
+  description  String
+  actor        String
+  metadata     Json              @default("{}")
+  created_at   DateTime          @default(now())
+
+  grievance grievances @relation(fields: [grievance_id], references: [id], onDelete: Cascade)
+
+  @@index([grievance_id])
+  @@index([created_at])
+}
+
+model community_issues {
+  id                      String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title                   String
+  category                GrievanceCategory
+  centroid                Unsupported("geometry(Point,4326)")?
+  radius_meters           Int                  @default(500)
+  linked_grievance_count  Int                  @default(0)
+  endorsement_count       Int                  @default(0)
+  severity_score          Int                  @default(0)
+  status                  CommunityIssueStatus @default(open)
+  created_at              DateTime             @default(now())
+
+  grievances grievances[]
+}
+
+model departments {
+  id               String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String              @unique
+  category_mapping GrievanceCategory[]
+  head_officer_id  String?             @unique @db.Uuid
+
+  head_officer officers?    @relation("department_head", fields: [head_officer_id], references: [id])
+  officers     officers[]   @relation("department_officers")
+  grievances   grievances[]
+}
+
+model officers {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  department_id String      @db.Uuid
+  ward_id       String?     @db.Uuid
+  role          OfficerRole
+  email         String      @unique
+  phone         String
+  password_hash String
+  created_at    DateTime    @default(now())
+
+  department            departments  @relation("department_officers", fields: [department_id], references: [id])
+  headed_department     departments? @relation("department_head")
+  ward                  wards?       @relation(fields: [ward_id], references: [id])
+  assigned_grievances   grievances[]
+
+  @@index([department_id])
+  @@index([email])
+}
+
+model wards {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String @unique
+  number   Int    @unique
+  boundary Unsupported("geometry(Polygon,4326)")?
+  zone     String
+
+  citizens   citizens[]
+  grievances grievances[]
+  officers   officers[]
+}
+
+model legal_rights {
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category       GrievanceCategory
+  law_name       String
+  summary        String
+  sla_days       Int
+  source_section String
+  state          String            @default("central")
+
+  @@index([category])
+}

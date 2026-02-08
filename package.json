@@ -1,0 +1,32 @@
+{
+  "name": "jansunwai-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "JanSunwai AI - The People's Grievance & Civic Action Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently --names web,api --prefix-colors blue,green \"npm run dev:web\" \"npm run dev:api\"",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "build": "npm run build --workspace=apps/api && npm run build --workspace=apps/web",
+    "build:web": "npm run build --workspace=apps/web",
+    "build:api": "npm run build --workspace=apps/api",
+    "db:migrate": "npm run db:migrate --workspace=apps/api",
+    "db:seed": "npm run db:seed --workspace=apps/api",
+    "db:studio": "npm run db:studio --workspace=apps/api",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "keywords": [
+    "civic-tech",
+    "grievance",
+    "ai",
+    "india"
+  ],
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
