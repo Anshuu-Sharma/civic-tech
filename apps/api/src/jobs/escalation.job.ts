@@ -1,5 +1,8 @@
 import cron from 'node-cron';
 import { checkAndEscalate } from '../services/escalation.service';
+import logger from '../lib/logger';
+
+const log = logger.scope('EscalationJob');
 
 let isRunning = false;
 
@@ -15,7 +18,7 @@ export function startEscalationJob(): void {
 
   cron.schedule(schedule, async () => {
     if (isRunning) {
-      console.log('[EscalationJob] Skipping -- previous run still in progress');
+      log.info('Skipping -- previous run still in progress');
       return;
     }
 
@@ -23,16 +26,16 @@ export function startEscalationJob(): void {
     const startTime = Date.now();
 
     try {
-      console.log(`[EscalationJob] Starting at ${new Date().toISOString()}`);
+      log.info(`Starting at ${new Date().toISOString()}`);
       const result = await checkAndEscalate();
       const duration = Date.now() - startTime;
-      console.log(`[EscalationJob] Completed in ${duration}ms: ${result.escalated} escalated`);
+      log.info(`Completed in ${duration}ms: ${result.escalated} escalated`);
     } catch (error: any) {
-      console.error('[EscalationJob] Failed:', error.message);
+      log.error('Failed:', error.message);
     } finally {
       isRunning = false;
     }
   });
 
-  console.log(`[EscalationJob] Scheduled with cron expression: ${schedule}`);
+  log.info(`Scheduled with cron expression: ${schedule}`);
 }

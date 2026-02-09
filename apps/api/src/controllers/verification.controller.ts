@@ -10,6 +10,9 @@ import {
   validateVerificationToken,
   markTokenUsed,
 } from '../services/verification.service';
+import logger from '../lib/logger';
+
+const log = logger.scope('Verification');
 
 /**
  * GET /api/v1/grievance/:id/verify/:token
@@ -100,7 +103,7 @@ export async function getVerificationPage(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error('Error in getVerificationPage:', error);
+    log.error('Error in getVerificationPage:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error.',
@@ -261,7 +264,7 @@ export async function submitVerification(req: Request, res: Response) {
       });
     }
   } catch (error) {
-    console.error('Error in submitVerification:', error);
+    log.error('Error in submitVerification:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error.',

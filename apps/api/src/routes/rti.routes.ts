@@ -8,6 +8,9 @@ import { Router, type Request, type Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { generateRtiApplication } from '../services/rti.service';
 import type { GrievanceForRti, LegalRightRecord } from '../services/rti.service';
+import logger from '../lib/logger';
+
+const rtiLog = logger.scope('RTI');
 
 const router = Router();
 
@@ -172,7 +175,7 @@ router.post('/generate/:grievanceId', async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error('Error in generateRti:', error);
+    rtiLog.error('Generate RTI failed:', error);
     return res.status(500).json({
       success: false,
       error: 'Failed to generate RTI application. Please try again.',
@@ -241,7 +244,7 @@ router.get('/:grievanceId', async (req: Request, res: Response) => {
       message: 'No RTI applications generated yet. Use POST /api/v1/rti/generate/:grievanceId to create one.',
     });
   } catch (error) {
-    console.error('Error in getRti:', error);
+    rtiLog.error('Get RTI failed:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error.',

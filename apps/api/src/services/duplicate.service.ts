@@ -7,6 +7,9 @@
 import type { GrievanceCategory } from '@jansunwai/shared';
 import { prisma } from '../lib/prisma';
 import { checkSemanticSimilarity } from './gemini.service';
+import logger from '../lib/logger';
+
+const log = logger.scope('Duplicate');
 
 const SIMILARITY_THRESHOLD = 0.7;
 const SEARCH_RADIUS_METERS = 500;
@@ -52,7 +55,7 @@ export async function findDuplicates(
       LIMIT 10
     `;
   } catch (err) {
-    console.warn('[Duplicate] PostGIS query failed:', err);
+    log.warn('PostGIS query failed:', err);
     return {
       is_duplicate: false,
       community_issue_id: null,

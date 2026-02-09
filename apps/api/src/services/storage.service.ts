@@ -5,6 +5,9 @@
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
+import logger from '../lib/logger';
+
+const log = logger.scope('Storage');
 
 const BUCKET_NAME = 'grievance-media';
 
@@ -37,9 +40,9 @@ export async function initStorageBucket(): Promise<void> {
     });
 
     if (error) {
-      console.error('[Storage] Failed to create bucket:', error.message);
+      log.error('Failed to create bucket:', error.message);
     } else {
-      console.log(`[Storage] Created bucket "${BUCKET_NAME}"`);
+      log.info(`Created bucket "${BUCKET_NAME}"`);
     }
   }
 }

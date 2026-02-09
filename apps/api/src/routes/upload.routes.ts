@@ -6,8 +6,10 @@
 import { Router, type Request, type Response } from 'express';
 import multer from 'multer';
 import { uploadFile, createSignedUploadUrl } from '../services/storage.service';
+import logger from '../lib/logger';
 
 const router = Router();
+const log = logger.scope('Upload');
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
@@ -50,7 +52,7 @@ router.post('/media', upload.array('files', 5), async (req: Request, res: Respon
 
     return res.json({ success: true, data: { urls } });
   } catch (err: any) {
-    console.error('[Upload] Error:', err);
+    log.error('Upload error:', err);
     return res.status(500).json({
       success: false,
       error: { code: 'UPLOAD_FAILED', message: err.message },

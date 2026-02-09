@@ -12,8 +12,10 @@ import verificationRoutes from './routes/verification.routes';
 import rtiRoutes from './routes/rti.routes';
 import { startEscalationJob } from './jobs/escalation.job';
 import { initStorageBucket } from './services/storage.service';
+import logger, { requestLogger, logStartupBanner } from './lib/logger';
 
 const app = express();
+const log = logger.scope('Server');
 
 // Middleware
 app.use(helmet());
@@ -21,13 +23,8 @@ app.use(cors({ origin: config.corsOrigin, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging (development)
-if (config.nodeEnv === 'development') {
-  app.use((req, _res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
-  });
-}
+// Request/Response logging
+app.use(requestLogger);
 
 // Health Check
 app.get('/api/v1/health', (_req, res) => {
@@ -53,7 +50,8 @@ app.use('/api/v1', verificationRoutes);
 app.use('/api/v1/rti', rtiRoutes);
 
 // 404 Handler
-app.use((_req, res) => {
+app.use((req, res) => {
+  log.warn(`404 Not Found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
     success: false,
     error: 'Endpoint not found',
@@ -61,9 +59,8 @@ app.use((_req, res) => {
 });
 
 // Global Error Handler
-app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('[Error]', err.message);
-  console.error(err.stack);
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  log.error(`Unhandled error on ${req.method} ${req.originalUrl}:`, err);
   res.status(500).json({
     success: false,
     error: config.nodeEnv === 'development' ? err.message : 'Internal server error',
@@ -72,29 +69,31 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 // Start Server
 async function start() {
-  // Initialize storage bucket (non-blocking - don't fail startup if Supabase service key is missing)
+  // Initialize storage bucket
   try {
     if (config.supabaseServiceRoleKey) {
       await initStorageBucket();
+      log.success('Storage bucket initialized');
     } else {
-      console.warn('[Storage] SUPABASE_SERVICE_ROLE_KEY not set, skipping storage bucket init');
+      log.warn('SUPABASE_SERVICE_ROLE_KEY not set, skipping storage bucket init');
     }
   } catch (err) {
-    console.warn('[Storage] Failed to initialize storage bucket:', err);
+    log.warn('Failed to initialize storage bucket:', err);
   }
 
   app.listen(config.port, () => {
-    console.log(`\n  JanSunwai AI API Server`);
-    console.log(`  =======================`);
-    console.log(`  Environment : ${config.nodeEnv}`);
-    console.log(`  Port        : ${config.port}`);
-    console.log(`  CORS Origin : ${config.corsOrigin}`);
-    console.log(`  Health      : http://localhost:${config.port}/api/v1/health`);
-    console.log();
+    logStartupBanner({
+      port: config.port,
+      env: config.nodeEnv,
+      corsOrigin: config.corsOrigin,
+    });
   });
 }
 
-start().catch(console.error);
+start().catch((err) => {
+  log.error('Failed to start server:', err);
+  process.exit(1);
+});
 
 startEscalationJob();
 

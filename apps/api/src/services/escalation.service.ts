@@ -1,4 +1,7 @@
 import { prisma } from '../lib/prisma';
+import logger from '../lib/logger';
+
+const log = logger.scope('Escalation');
 
 /**
  * Escalation thresholds.
@@ -175,22 +178,22 @@ export async function checkAndEscalate(): Promise<EscalationResult> {
         result.escalated++;
         result.by_level[newLevel] = (result.by_level[newLevel] || 0) + 1;
 
-        console.log(
-          `[Escalation] ${grievance.complaint_number}: Level ${currentLevel} -> ${newLevel} (${Math.round(hoursSinceFiled)}h old)`
+        log.info(
+          `${grievance.complaint_number}: Level ${currentLevel} -> ${newLevel} (${Math.round(hoursSinceFiled)}h old)`
         );
       } catch (err: any) {
         result.errors++;
-        console.error(`[Escalation] Error processing ${grievance.id}:`, err.message);
+        log.error(`Error processing ${grievance.id}:`, err.message);
       }
     }
 
-    console.log(
-      `[Escalation] Complete: checked=${result.total_checked}, escalated=${result.escalated}, by_level=${JSON.stringify(result.by_level)}, errors=${result.errors}`
+    log.info(
+      `Complete: checked=${result.total_checked}, escalated=${result.escalated}, by_level=${JSON.stringify(result.by_level)}, errors=${result.errors}`
     );
 
     return result;
   } catch (error: any) {
-    console.error('[Escalation] Fatal error:', error);
+    log.error('Fatal error:', error);
     throw error;
   }
 }

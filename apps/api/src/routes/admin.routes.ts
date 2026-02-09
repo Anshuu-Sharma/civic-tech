@@ -2,8 +2,10 @@ import { Router, Response } from 'express';
 import { requireAuth, requireRole, AuthenticatedRequest } from '../middleware/auth.middleware';
 import { prisma } from '../lib/prisma';
 import { checkAndEscalate } from '../services/escalation.service';
+import logger from '../lib/logger';
 
 const router = Router();
+const log = logger.scope('Admin');
 
 // All admin routes require authentication
 router.use(requireAuth);
@@ -93,7 +95,7 @@ router.get('/queue', async (req: AuthenticatedRequest, res: Response) => {
       },
     });
   } catch (error: any) {
-    console.error('[Admin] Queue error:', error);
+    log.error('[Admin] Queue error:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -165,7 +167,7 @@ router.get('/grievance/:id', async (req: AuthenticatedRequest, res: Response) =>
       legal_rights: legalRights,
     });
   } catch (error: any) {
-    console.error('[Admin] Grievance detail error:', error);
+    log.error('[Admin] Grievance detail error:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -297,7 +299,7 @@ router.patch('/grievance/:id/update', async (req: AuthenticatedRequest, res: Res
 
     return res.json({ success: true, grievance: updated, timeline_entry: timeline });
   } catch (error: any) {
-    console.error('[Admin] Grievance update error:', error);
+    log.error('[Admin] Grievance update error:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -395,7 +397,7 @@ router.get('/stats', async (req: AuthenticatedRequest, res: Response) => {
       })),
     });
   } catch (error: any) {
-    console.error('[Admin] Stats error:', error);
+    log.error('[Admin] Stats error:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -469,7 +471,7 @@ router.get(
         },
       });
     } catch (error: any) {
-      console.error('[Admin] Escalations error:', error);
+      log.error('[Admin] Escalations error:', error);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
   }
@@ -554,7 +556,7 @@ router.post(
 
       return res.json({ success: true, grievance: updated, timeline_entry: timeline });
     } catch (error: any) {
-      console.error('[Admin] Manual escalation error:', error);
+      log.error('[Admin] Manual escalation error:', error);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
   }
@@ -574,7 +576,7 @@ router.get('/officers', async (req: AuthenticatedRequest, res: Response) => {
 
     return res.json({ success: true, officers });
   } catch (error: any) {
-    console.error('[Admin] Officers list error:', error);
+    log.error('[Admin] Officers list error:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -605,7 +607,7 @@ router.get('/activity', async (req: AuthenticatedRequest, res: Response) => {
 
     return res.json({ success: true, entries });
   } catch (error: any) {
-    console.error('[Admin] Activity error:', error);
+    log.error('[Admin] Activity error:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -624,7 +626,7 @@ router.post(
         ...result,
       });
     } catch (error: any) {
-      console.error('[Admin] Manual escalation run error:', error);
+      log.error('[Admin] Manual escalation run error:', error);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
   }

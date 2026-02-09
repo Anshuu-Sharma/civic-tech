@@ -12,6 +12,9 @@ import {
   type Part,
 } from '@google/generative-ai';
 import type { GrievanceClassification, GrievanceCategory, Language } from '@jansunwai/shared';
+import logger from '../lib/logger';
+
+const log = logger.scope('Gemini');
 
 // ------------------------------------------------------------------
 // Initialization
@@ -155,7 +158,7 @@ export async function classifyGrievance(
           },
         });
       } catch (err) {
-        console.warn(`[Gemini] Failed to fetch image ${url}:`, err);
+        log.warn(`Failed to fetch image ${url}:`, err);
         // Continue without this image
       }
     }
@@ -178,13 +181,13 @@ export async function classifyGrievance(
     ];
 
     if (!validCategories.includes(parsed.category)) {
-      console.warn(`[Gemini] Invalid category "${parsed.category}", defaulting to water_supply`);
+      log.warn(`Invalid category "${parsed.category}", defaulting to water_supply`);
       parsed.category = 'water_supply';
     }
 
     return parsed;
   } catch (err) {
-    console.error('[Gemini] Failed to parse classification JSON:', responseText);
+    log.error('Failed to parse classification JSON:', responseText);
     // Fallback classification
     return {
       category: 'water_supply',
@@ -309,7 +312,7 @@ export async function checkSemanticSimilarity(
   const score = parseFloat(text);
 
   if (isNaN(score) || score < 0 || score > 1) {
-    console.warn(`[Gemini] Invalid similarity score "${text}", defaulting to 0.0`);
+    log.warn(`Invalid similarity score "${text}", defaulting to 0.0`);
     return 0.0;
   }
 

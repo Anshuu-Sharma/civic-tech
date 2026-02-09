@@ -5,6 +5,9 @@
 
 import type { GrievanceCategory, VulnerabilityFlag } from '@jansunwai/shared';
 import { prisma } from '../lib/prisma';
+import logger from '../lib/logger';
+
+const log = logger.scope('Severity');
 
 // ------------------------------------------------------------------
 // Constants
@@ -94,7 +97,7 @@ export async function calculateSeverityScore(input: SeverityInput): Promise<numb
     else if (count <= 20) affectedPopulationScore = 80;
     else affectedPopulationScore = 100;
   } catch (err) {
-    console.warn('[Severity] PostGIS nearby query failed, defaulting to 0:', err);
+    log.warn('PostGIS nearby query failed, defaulting to 0:', err);
     affectedPopulationScore = 0;
   }
 
@@ -149,7 +152,7 @@ export async function calculateSeverityScore(input: SeverityInput): Promise<numb
     // Scale: 0 = 0, 1 = 20, 2 = 40, 3 = 60, 4 = 80, 5+ = 100
     recurrenceScore = Math.min(count * 20, 100);
   } catch (err) {
-    console.warn('[Severity] PostGIS recurrence query failed, defaulting to 0:', err);
+    log.warn('PostGIS recurrence query failed, defaulting to 0:', err);
     recurrenceScore = 0;
   }
 

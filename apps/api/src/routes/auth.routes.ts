@@ -2,6 +2,9 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
+import logger from '../lib/logger';
+
+const log = logger.scope('Auth');
 
 const router = Router();
 
@@ -58,7 +61,7 @@ router.post('/login', async (req: Request, res: Response) => {
       token,
     });
   } catch (error: any) {
-    console.error('[Auth] Login error:', error);
+    log.error('Login error:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -92,7 +95,7 @@ router.post('/seed-officer', async (req: Request, res: Response) => {
 
     return res.json({ officer: { id: officer.id, email: officer.email, role: officer.role } });
   } catch (error: any) {
-    console.error('[Auth] Seed error:', error);
+    log.error('Seed error:', error);
     return res.status(500).json({ message: error.message });
   }
 });

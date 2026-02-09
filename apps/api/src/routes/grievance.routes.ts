@@ -16,8 +16,10 @@ import {
   grievanceIdParamSchema,
 } from '../validators/grievance.validator';
 import type { VulnerabilityFlag, Language, GrievanceCategory } from '@jansunwai/shared';
+import logger from '../lib/logger';
 
 const router = Router();
+const log = logger.scope('Grievance');
 
 // ------------------------------------------------------------------
 // POST /api/v1/grievance/file
@@ -65,28 +67,36 @@ router.post('/file', async (req: Request, res: Response) => {
     }
 
     // 3. AI Classification (Gemini)
-    console.log('[Grievance] Classifying with Gemini...');
+    const endClassify = log.time('Gemini classification');
+    log.info(`Classifying: "${input.description.slice(0, 80)}..."`);
     const classification = await classifyGrievance(
       input.description,
       input.media_urls.length > 0 ? input.media_urls : undefined
     );
-    console.log('[Grievance] Classification result:', classification);
+    endClassify();
+    log.success(`Category: ${classification.category}/${classification.sub_category}, Severity estimate: ${classification.severity_estimate}`);
 
     // 4. Resolve ward from coordinates
     const wardResult = await resolveWard(input.latitude, input.longitude);
+    log.debug(`Ward resolved: ${wardResult ? wardResult.ward_name : 'none'}`);
 
     // 5. Duplicate detection
-    console.log('[Grievance] Checking for duplicates...');
+    const endDuplicate = log.time('Duplicate detection');
     const duplicateResult = await findDuplicates(
       input.latitude,
       input.longitude,
       classification.category,
       input.description
     );
-    console.log('[Grievance] Duplicate result:', duplicateResult);
+    endDuplicate();
+    if (duplicateResult.is_duplicate) {
+      log.info(`Duplicate found! Matched: ${duplicateResult.matched_grievance_id}, Similarity: ${duplicateResult.similarity_score}`);
+    } else {
+      log.debug('No duplicates found');
+    }
 
     // 6. Severity scoring
-    console.log('[Grievance] Calculating severity...');
+    const endSeverity = log.time('Severity calculation');
     const severityScore = await calculateSeverityScore({
       category: classification.category,
       latitude: input.latitude,
@@ -94,7 +104,8 @@ router.post('/file', async (req: Request, res: Response) => {
       vulnerabilityFlags: input.vulnerability_flags as VulnerabilityFlag[],
       communityIssueId: duplicateResult.community_issue_id,
     });
-    console.log('[Grievance] Severity score:', severityScore);
+    endSeverity();
+    log.info(`Severity score: ${severityScore}/100`);
 
     // 7. Department routing
     const routing = await routeGrievance(
@@ -111,7 +122,7 @@ router.post('/file', async (req: Request, res: Response) => {
     });
 
     // 10. Generate legal rights summary via Gemini
-    console.log('[Grievance] Generating legal rights summary...');
+    const endLegal = log.time('Legal rights summary');
     const legalRightsSummary = await generateLegalRightsSummary(
       classification.category,
       input.language as Language,
@@ -123,6 +134,8 @@ router.post('/file', async (req: Request, res: Response) => {
         state: lr.state,
       }))
     );
+
+    endLegal();
 
     // 11. Create grievance record
     // Using raw SQL for the PostGIS location column
@@ -188,6 +201,8 @@ router.post('/file', async (req: Request, res: Response) => {
       },
     });
 
+    log.success(`Created ${complaintNumber} -> ${routing.department_name}`);
+
     // 14. Return response
     return res.status(201).json({
       success: true,
@@ -205,7 +220,7 @@ router.post('/file', async (req: Request, res: Response) => {
       },
     });
   } catch (err: any) {
-    console.error('[Grievance] Filing error:', err);
+    log.error('Filing failed:', err);
     return res.status(500).json({
       success: false,
       error: {

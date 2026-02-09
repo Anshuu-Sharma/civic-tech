@@ -6,6 +6,9 @@
 
 import type { GrievanceCategory } from '@jansunwai/shared';
 import { prisma } from '../lib/prisma';
+import logger from '../lib/logger';
+
+const log = logger.scope('Routing');
 
 interface RoutingResult {
   department_id: string;
@@ -39,7 +42,7 @@ export async function routeGrievance(
   });
 
   if (!department) {
-    console.warn(`[Routing] No department found for category "${category}"`);
+    log.warn(`No department found for category "${category}"`);
     // Return a fallback -- general administration
     const fallback = await prisma.departments.findFirst({
       include: { head_officer: true },
@@ -106,7 +109,7 @@ export async function resolveWard(
 
     return null;
   } catch (err) {
-    console.warn('[Routing] Ward resolution failed:', err);
+    log.warn('Ward resolution failed:', err);
     return null;
   }
 }

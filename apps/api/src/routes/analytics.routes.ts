@@ -5,6 +5,9 @@ import {
   wardsQuerySchema,
   trendsQuerySchema,
 } from '../validators/analytics.validator';
+import logger from '../lib/logger';
+
+const log = logger.scope('Analytics');
 
 const router = Router();
 const controller = new AnalyticsController();
@@ -81,7 +84,7 @@ router.get('/stats', async (_req, res) => {
       },
     });
   } catch (error: any) {
-    console.error('[Analytics Stats] Error:', error.message);
+    log.error('Stats error:', error.message);
     return res.status(500).json({ success: false, error: 'Failed to fetch stats' });
   }
 });

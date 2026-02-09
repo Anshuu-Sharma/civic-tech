@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import logger from '../lib/logger';
+
+const log = logger.scope('Auth');
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'jansunwai-dev-secret';
 
@@ -46,6 +49,7 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
 
     next();
   } catch (error) {
+    log.debug('Failed auth attempt:', error);
     res.status(401).json({ success: false, message: 'Invalid or expired token' });
     return;
   }

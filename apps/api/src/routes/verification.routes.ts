@@ -9,6 +9,9 @@ import {
   getVerificationPage,
   submitVerification,
 } from '../controllers/verification.controller';
+import logger from '../lib/logger';
+
+const log = logger.scope('Verification');
 
 const router = Router();
 
@@ -82,7 +85,7 @@ router.get('/grievance/verify-by-token/:token', async (req, res) => {
       },
     });
   } catch (error: any) {
-    console.error('[VerifyByToken] Error:', error.message);
+    log.error('VerifyByToken error:', error.message);
     return res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
