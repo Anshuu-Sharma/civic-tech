@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import {
-  Shield, Filter, X, MapPin, TrendingUp, TrendingDown,
+  Filter, X, MapPin, TrendingUp, TrendingDown,
   AlertTriangle, ChevronDown, Loader2, RefreshCw,
   Map as MapIcon, Table as TableIcon,
   Droplets, Zap, Construction, Trash2, CloudRain, Lamp, Bus, Wheat,
   Briefcase, Home, TreePine
 } from 'lucide-react';
-import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 import {
   useHeatmapData,
   useWardScorecards,
@@ -479,27 +479,19 @@ export default function DashboardPage() {
     <div className="flex flex-col h-screen bg-white">
       <div className="saffron-strip" />
 
-      {/* Header */}
+      {/* Nav */}
+      <Navbar />
+
+      {/* Dashboard toolbar */}
       <header className="border-b border-gray-100 shrink-0">
-        <div className="max-w-[1600px] mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-saffron-500 to-saffron-600 flex items-center justify-center">
-                <Shield className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <span className="font-bold text-civic-900 text-sm tracking-tight">JanSunwai</span>
-                <span className="text-saffron-500 font-bold text-sm ml-0.5">AI</span>
-              </div>
-            </Link>
-            <div className="hidden sm:block border-l border-gray-200 pl-4">
-              <h1 className="text-sm font-bold text-civic-900">Public Dashboard</h1>
-              <p className="text-[11px] text-gray-400">
-                {data
-                  ? `${data.summary.total_grievances} grievances across Delhi`
-                  : 'Loading dashboard data...'}
-              </p>
-            </div>
+        <div className="max-w-[1600px] mx-auto px-4 py-2 flex items-center justify-between">
+          <div className="hidden sm:block">
+            <h1 className="text-sm font-bold text-civic-900">Public Dashboard</h1>
+            <p className="text-[11px] text-gray-400">
+              {data
+                ? `${data.summary.total_grievances} grievances across Delhi`
+                : 'Loading dashboard data...'}
+            </p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -546,13 +538,6 @@ export default function DashboardPage() {
             >
               <RefreshCw className="w-4 h-4" />
             </button>
-
-            <Link
-              href="/file-complaint"
-              className="hidden sm:inline-flex bg-saffron-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-saffron-600 transition-colors"
-            >
-              File Complaint
-            </Link>
           </div>
         </div>
       </header>

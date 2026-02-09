@@ -7,6 +7,7 @@ import {
   Droplets, Zap, Construction, Trash2, CloudRain, Lamp, Bus, Wheat, Heart, Scale, Building2, Trees
 } from 'lucide-react';
 import { apiPost } from '@/lib/api';
+import Navbar from '@/components/Navbar';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 interface FormData {
@@ -197,6 +198,7 @@ export default function FileComplaintPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-saffron-50 to-white">
         <div className="saffron-strip" />
+        <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-12">
           <div className="success-fade">
             {/* Success header */}
@@ -299,14 +301,11 @@ export default function FileComplaintPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-saffron-50 via-white to-civic-50 noise-bg">
       <div className="saffron-strip" />
+      <Navbar />
 
       <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-saffron-100 text-saffron-800 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <Shield className="w-4 h-4" />
-            JanSunwai AI
-          </div>
           <h1 className="text-3xl font-bold text-civic-900 tracking-tight">
             File a Grievance
           </h1>

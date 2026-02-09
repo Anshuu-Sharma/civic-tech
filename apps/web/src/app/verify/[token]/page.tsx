@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 import {
   Shield, CheckCircle2, XCircle, Star, Loader2, AlertTriangle,
   Clock, Building2, User, FileText, MapPin, ArrowLeft, Send
@@ -203,19 +204,7 @@ export default function VerifyPage() {
       <div className="saffron-strip" />
 
       {/* Nav */}
-      <nav className="border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-saffron-500 to-saffron-600 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="font-bold text-civic-900 text-lg tracking-tight">JanSunwai</span>
-              <span className="text-saffron-500 font-bold text-lg ml-0.5">AI</span>
-            </div>
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="max-w-2xl mx-auto px-4 py-10">
         <div className="text-center mb-8">

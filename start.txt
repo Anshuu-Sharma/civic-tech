@@ -1,0 +1,7 @@
+To Run
+
+  # Terminal 1 - API
+  cd apps/api && npx tsx src/index.ts
+
+  # Terminal 2 - Frontend
+  cd apps/web && npx next dev

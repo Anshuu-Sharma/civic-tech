@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 import {
   Shield, FileText, Loader2, AlertTriangle, ArrowLeft,
   Download, Scale, Building2, Calendar, Printer, Globe
@@ -119,24 +120,7 @@ export default function RtiPage() {
       <div className="saffron-strip" />
 
       {/* Nav */}
-      <nav className="border-b border-gray-100 print:hidden">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-saffron-500 to-saffron-600 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="font-bold text-civic-900 text-lg tracking-tight">JanSunwai</span>
-              <span className="text-saffron-500 font-bold text-lg ml-0.5">AI</span>
-            </div>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/track" className="text-sm text-gray-500 hover:text-saffron-600 font-medium transition-colors">
-              Track Complaint
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 py-10">
         {/* Header */}

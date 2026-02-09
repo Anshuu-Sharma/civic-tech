@@ -8,6 +8,7 @@ import {
   AlertTriangle, MapPin, Megaphone, ShieldCheck
 } from 'lucide-react';
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
@@ -93,30 +94,7 @@ export default function Home() {
       <div className="saffron-strip" />
 
       {/* Nav */}
-      <nav className="border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-sm z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-saffron-500 to-saffron-600 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="font-bold text-civic-900 text-lg tracking-tight">JanSunwai</span>
-              <span className="text-saffron-500 font-bold text-lg ml-0.5">AI</span>
-            </div>
-          </Link>
-          <div className="hidden sm:flex items-center gap-6 text-sm font-medium text-gray-600">
-            <Link href="/file-complaint" className="hover:text-saffron-600 transition-colors">File Complaint</Link>
-            <Link href="/track" className="hover:text-saffron-600 transition-colors">Track</Link>
-            <Link href="/dashboard" className="hover:text-saffron-600 transition-colors">Dashboard</Link>
-            <Link href="/voice-assistant" className="hover:text-saffron-600 transition-colors flex items-center gap-1">
-              <Mic className="w-3.5 h-3.5" /> Voice
-            </Link>
-          </div>
-          <Link href="/file-complaint" className="bg-saffron-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-saffron-600 transition-colors">
-            File Now
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* ========== HERO ========== */}
       <section className="relative overflow-hidden">
