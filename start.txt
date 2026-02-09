@@ -5,3 +5,6 @@ To Run
 
   # Terminal 2 - Frontend
   cd apps/web && npx next dev
+
+  # Terminal 3 - Voice Agent
+  cd apps/voice-agent && uv run python agent.py dev

@@ -184,12 +184,20 @@ class JanSunwaiAPIClient:
                 - legal_rights_summary (str): plain-language rights info
                 - error (str, optional): error message if success is False
         """
-        payload = {
+        # Normalize language to ISO code (LLM sometimes sends "Hindi" instead of "hi")
+        lang_map = {
+            "hindi": "hi", "english": "en", "tamil": "ta", "telugu": "te",
+            "bengali": "bn", "marathi": "mr", "gujarati": "gu", "kannada": "kn",
+            "malayalam": "ml", "punjabi": "pa", "odia": "or", "urdu": "ur",
+        }
+        lang_code = lang_map.get(language.lower(), language.lower()) if language else "hi"
+
+        payload: dict = {
             "phone": phone,
             "description": description,
-            "location_text": location_text,
+            "address": location_text,
             "channel": "voice",
-            "language": language,
+            "language": lang_code,
         }
 
         if name:

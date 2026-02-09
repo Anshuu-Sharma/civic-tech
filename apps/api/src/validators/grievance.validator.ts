@@ -22,12 +22,16 @@ export const fileGrievanceSchema = z.object({
   latitude: z
     .number()
     .min(-90, 'Invalid latitude')
-    .max(90, 'Invalid latitude'),
+    .max(90, 'Invalid latitude')
+    .optional()
+    .default(0),
 
   longitude: z
     .number()
     .min(-180, 'Invalid longitude')
-    .max(180, 'Invalid longitude'),
+    .max(180, 'Invalid longitude')
+    .optional()
+    .default(0),
 
   address: z
     .string()
