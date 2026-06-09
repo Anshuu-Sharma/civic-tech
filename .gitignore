@@ -54,5 +54,5 @@ coverage/
 # Secrets
 envs.txt
 
-# Documentation (contains sensitive keys)
+# Documentation 
 docs/
