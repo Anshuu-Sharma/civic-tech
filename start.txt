@@ -1,10 +1,9 @@
 To Run
 
-  # Terminal 1 - API
-  cd apps/api && npx tsx src/index.ts
+  # Terminal 1 (Starts both Next.js Web App and Express API concurrently)
+  # Make sure you are in the project root: /Users/mac/Desktop/Projects/Hackathons/civic tech
+  npm run dev
 
-  # Terminal 2 - Frontend
-  cd apps/web && npx next dev
-
-  # Terminal 3 - Voice Agent
-  cd apps/voice-agent && uv run python agent.py dev
+  # Terminal 2 (Starts the Python Voice Agent)
+  cd apps/voice-agent
+  uv run python agent.py dev
