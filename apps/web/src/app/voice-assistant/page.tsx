@@ -23,7 +23,7 @@ import {
   useRemoteParticipants,
   RoomAudioRenderer,
 } from "@livekit/components-react";
-import { RoomEvent } from "livekit-client";
+import { RoomEvent, type TranscriptionSegment, type Participant } from "livekit-client";
 
 // ============================================================================
 // Types
@@ -118,12 +118,18 @@ export default function VoiceAssistantPage() {
     setTimeout(() => setCallState("idle"), 500);
   }, []);
 
-  // Add transcript entry
-  const addTranscript = useCallback((entry: Omit<TranscriptEntry, "id">) => {
-    setTranscript((prev) => [
-      ...prev,
-      { ...entry, id: `${Date.now()}-${Math.random().toString(36).slice(2)}` },
-    ]);
+  // Add or update transcript entry (upsert by id to handle interim → final updates)
+  const addTranscript = useCallback((entry: TranscriptEntry) => {
+    setTranscript((prev) => {
+      const idx = prev.findIndex((e) => e.id === entry.id);
+      if (idx >= 0) {
+        // Update existing entry (interim → final)
+        const updated = [...prev];
+        updated[idx] = entry;
+        return updated;
+      }
+      return [...prev, entry];
+    });
   }, []);
 
   return (
@@ -326,7 +332,7 @@ function ActiveCallView({
 }: {
   onEndCall: () => void;
   transcript: TranscriptEntry[];
-  onTranscript: (entry: Omit<TranscriptEntry, "id">) => void;
+  onTranscript: (entry: TranscriptEntry) => void;
 }) {
   const room = useRoomContext();
   const { localParticipant } = useLocalParticipant();
@@ -340,42 +346,37 @@ function ActiveCallView({
     transcriptEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [transcript]);
 
-  // Listen for transcription events from LiveKit data messages
+  // Listen for LiveKit transcription events (sent by AgentSession's TranscriptSynchronizer)
   useEffect(() => {
     if (!room) return;
 
-    const handleDataReceived = (
-      payload: Uint8Array,
-      participant: unknown,
-      kind: unknown,
-      topic: string | undefined,
+    const handleTranscription = (
+      segments: TranscriptionSegment[],
+      participant?: Participant,
     ) => {
-      try {
-        const text = new TextDecoder().decode(payload);
-        const data = JSON.parse(text);
+      for (const seg of segments) {
+        if (!seg.text.trim()) continue;
 
-        if (data.type === "transcription") {
-          onTranscript({
-            speaker: data.speaker === "agent" ? "agent" : "citizen",
-            text: data.text,
-            timestamp: new Date(),
-            isFinal: data.isFinal ?? true,
-          });
+        const isAgent = participant ? !participant.isLocal : true;
 
-          // Update agent status based on who is speaking
-          if (data.speaker === "agent") {
-            setAgentStatus("speaking");
-          }
+        onTranscript({
+          id: seg.id,
+          speaker: isAgent ? "agent" : "citizen",
+          text: seg.text,
+          timestamp: new Date(),
+          isFinal: seg.final,
+        });
+
+        if (isAgent && seg.final) {
+          setAgentStatus("speaking");
         }
-      } catch {
-        // Ignore non-JSON data messages
       }
     };
 
-    room.on(RoomEvent.DataReceived, handleDataReceived);
+    room.on(RoomEvent.TranscriptionReceived, handleTranscription);
 
     return () => {
-      room.off(RoomEvent.DataReceived, handleDataReceived);
+      room.off(RoomEvent.TranscriptionReceived, handleTranscription);
     };
   }, [room, onTranscript]);
 

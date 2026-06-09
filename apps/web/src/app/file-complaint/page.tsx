@@ -164,8 +164,8 @@ export default function FileComplaintPage() {
         phone: form.phone,
         name: form.name || undefined,
         description: form.description,
-        latitude: form.latitude,
-        longitude: form.longitude,
+        latitude: form.latitude ?? undefined,
+        longitude: form.longitude ?? undefined,
         address: form.address,
         language: form.language,
         channel: 'web',
@@ -175,7 +175,8 @@ export default function FileComplaintPage() {
       if (res.success && res.data) {
         setResult(res.data);
       } else {
-        setError(res.error || 'Submission failed. Please try again.');
+        const err = res.error;
+        setError(typeof err === 'string' ? err : (err as any)?.message || 'Submission failed. Please try again.');
       }
     } catch {
       setError('Network error. Please check your connection.');

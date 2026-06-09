@@ -35,8 +35,9 @@ export const fileGrievanceSchema = z.object({
 
   address: z
     .string()
-    .min(5, 'Address must be at least 5 characters')
-    .max(500),
+    .max(500)
+    .optional()
+    .default(''),
 
   language: z.enum(['hi', 'en', 'ta', 'te', 'bn', 'mr', 'gu', 'kn', 'ml', 'pa', 'or', 'ur']).default('hi'),
 

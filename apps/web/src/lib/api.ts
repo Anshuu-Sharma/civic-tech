@@ -3,7 +3,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
-  error?: string;
+  error?: string | { code: string; message: string; details?: unknown };
   message?: string;
 }
 
