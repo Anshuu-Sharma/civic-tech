@@ -31,8 +31,8 @@ interface GrievanceDetail {
   escalation_level: number;
   created_at: string;
   resolved_at: string | null;
-  assigned_department?: { name: string };
-  assigned_officer?: { name: string };
+  assigned_department?: string;
+  assigned_officer?: string | null;
   citizen?: { phone: string; name: string | null };
   legal_rights_summary: string | null;
   timeline: TimelineEntry[];
@@ -320,10 +320,10 @@ export default function TrackPage() {
                 <div className="flex items-center gap-2 text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">
                   <Building2 className="w-3.5 h-3.5" /> Assigned Department
                 </div>
-                <p className="font-semibold text-civic-900">{grievance.assigned_department?.name || 'Pending Assignment'}</p>
-                {grievance.assigned_officer?.name && (
+                <p className="font-semibold text-civic-900">{grievance.assigned_department || 'Pending Assignment'}</p>
+                {grievance.assigned_officer && (
                   <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
-                    <User className="w-3 h-3" /> {grievance.assigned_officer.name}
+                    <User className="w-3 h-3" /> {grievance.assigned_officer}
                   </p>
                 )}
               </div>

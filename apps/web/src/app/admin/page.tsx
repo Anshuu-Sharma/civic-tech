@@ -49,7 +49,7 @@ export default function AdminDashboardPage() {
       try {
         const [statsRes, queueRes] = await Promise.all([
           adminFetch(`/api/v1/admin/stats`).catch(() => null),
-          adminFetch(`/api/v1/admin/queue/${session!.user.departmentId}?limit=5&sort_by=updated_at&sort_order=desc`).catch(() => null),
+          adminFetch(`/api/v1/admin/queue?department_id=${session!.user.departmentId}&limit=5&sort_by=updated_at&sort_order=desc`).catch(() => null),
         ]);
 
         if (statsRes) {

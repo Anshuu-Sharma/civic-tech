@@ -29,7 +29,7 @@ const safetySettings = [
   { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
 ];
 
-function getModel(modelName = 'gemini-2.0-flash'): GenerativeModel {
+function getModel(modelName = 'gemini-2.5-flash'): GenerativeModel {
   return genAI.getGenerativeModel({
     model: modelName,
     safetySettings,

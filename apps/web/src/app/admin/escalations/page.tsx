@@ -49,7 +49,7 @@ export default function EscalationsPage() {
     setLoading(true);
     try {
       const res = await adminFetch(
-        `/api/v1/admin/queue/${session.user.departmentId}?status=escalated&sort_by=escalation_level&sort_order=desc&limit=50`
+        `/api/v1/admin/queue?department_id=${session.user.departmentId}&status=escalated&sort_by=escalation_level&sort_order=desc&limit=50`
       );
       setGrievances(res.grievances || []);
     } catch {

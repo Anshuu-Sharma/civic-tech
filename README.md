@@ -61,6 +61,22 @@ Built as an AI-powered unified monorepo, it transforms the broken complaint redr
 
 ---
 
+## 📸 Demo Screenshots
+
+Here are some screenshots of the JanSunwai AI platform in action:
+
+<p align="center">
+  <img src="./demo/demo1.png" width="45%" alt="Demo 1" />
+  <img src="./demo/demo2.png" width="45%" alt="Demo 2" />
+  <img src="./demo/demo3.png" width="45%" alt="Demo 3" />
+  <img src="./demo/demo4.png" width="45%" alt="Demo 4" />
+  <img src="./demo/demo5.png" width="45%" alt="Demo 5" />
+  <img src="./demo/demo6.png" width="45%" alt="Demo 6" />
+  <img src="./demo/demo7.png" width="45%" alt="Demo 7" />
+</p>
+
+---
+
 ## 💻 Tech Stack
 
 - **Architecture**: Turborepo, npm Workspaces, TypeScript 5.

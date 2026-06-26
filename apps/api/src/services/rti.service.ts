@@ -72,7 +72,7 @@ export async function generateRtiApplication(
   grievance: GrievanceForRti,
   legalRights: LegalRightRecord[]
 ): Promise<RtiGenerationResult> {
-  const modelName = 'gemini-2.0-flash';
+  const modelName = 'gemini-2.5-flash';
   const model = genAI.getGenerativeModel({
     model: modelName,
     safetySettings,

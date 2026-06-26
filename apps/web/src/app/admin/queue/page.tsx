@@ -88,7 +88,7 @@ export default function QueuePage() {
       });
       if (activeTab !== 'all') params.set('status', activeTab);
 
-      const res = await adminFetch(`/api/v1/admin/queue/${session.user.departmentId}?${params}`);
+      const res = await adminFetch(`/api/v1/admin/queue?department_id=${session.user.departmentId}&${params}`);
       setGrievances(res.grievances || []);
       setTotalPages(res.pagination?.total_pages || 1);
       setTotal(res.pagination?.total || 0);
